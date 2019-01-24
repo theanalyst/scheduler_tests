@@ -8,7 +8,7 @@ from botocore.awsrequest import AWSRequest
 def get_s3_auth_headers(creds, url, method, body=""):
     req = AWSRequest(method = method,
                      url = url)
-    sig = S3SigV4Auth(Credentials(access_key='access1',secret_key='secret1'),
+    sig = S3SigV4Auth(Credentials(**creds),
                       's3','us-east-1')
     sig.headers_to_sign(req)
     sig.add_auth(req)
