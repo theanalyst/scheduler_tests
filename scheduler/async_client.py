@@ -1,5 +1,6 @@
 import asyncio
-from aiohttp import ClientSession, TCPConnector
+import logging
+from aiohttp import ClientSession, TCPConnector, ClientTimeout
 
 from botocore.auth import S3SigV4Auth
 from botocore.credentials import Credentials
@@ -20,6 +21,8 @@ class AsyncClient():
         self.handler = response_handler
         self.auth_type = auth_type
         self.auth_creds = auth_creds
+        self.logger = logging.getLogger('async-client')
+        self.logger.setLevel(logging.INFO)
 
     def get_auth_headers(self, auth_type, *args):
         if auth_type is None:
@@ -29,7 +32,7 @@ class AsyncClient():
         else:
             raise NotImplementedError("the selected auth_type isn't implemented")
 
-    async def get_request(self, url, session, headers={}, *params):
+    async def get_request(self, url, session, headers={}, req_count=1, *params):
         auth_headers = self.get_auth_headers(self.auth_type,
                                              self.auth_creds, url, "GET")
         headers.update(auth_headers)
@@ -38,20 +41,21 @@ class AsyncClient():
             if self.handler.needs_data():
                 resp_data = await resp.read()
 
-        return self.handler.handle_response(resp, resp_data)
+        self.logger.debug('Finished reading data for req: %d' % req_count)
+        self.handler.handle_response(resp, resp_data)
 
-    def make_request(self, req_type, req_url, *params):
+    def make_request(self, req_type, req_url, *params, **kwargs):
         if req_type == "GET":
-            return self.get_request(req_url, *params)
-
+            return self.get_request(req_url, *params, **kwargs)
 
     async def run(self, req_type, req_url, req_count=100, *req_params):
         reqs = []
-        async with ClientSession(connector=TCPConnector(limit=None, keepalive_timeout=300)) as s:
+        timeout = ClientTimeout(total=600)
+        async with ClientSession(connector=TCPConnector(limit=None, keepalive_timeout=300),timeout=timeout) as s:
             for i in range(int(req_count)):
-                #print('making request!')
+                self.logger.debug('making request: %d' % i)
                 reqs.append(asyncio.ensure_future(
-                    self.make_request(req_type, req_url, s, *req_params)
+                    self.make_request(req_type, req_url, s, req_count=i, *req_params)
                 ))
 
             responses = await asyncio.gather(*reqs)
