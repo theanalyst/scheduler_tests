@@ -23,9 +23,6 @@ class CounterHandler(ResponseHandler):
     def handle_response(self, response, *_):
         self.counter[response.status] += 1
 
-    def needs_data(self):
-        return True
-
     def print_stats(self):
         for k,v in self.counter.items():
             print(k,': ',v)
