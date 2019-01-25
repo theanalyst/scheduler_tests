@@ -52,4 +52,8 @@ class ReqTypeCounterHandler(ResponseHandler):
         pprint.pprint(self.counter)
 
 
-def make_counter_handler(ctx):
+def make_response_handler(ctx):
+    if ctx.response_handler == 'simple':
+        return CounterHandler()
+    # default to reqtype counter
+    return ReqTypeCounterHandler(ctx.arg_list)
