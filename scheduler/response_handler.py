@@ -1,6 +1,8 @@
 import abc
+from collections import Counter, defaultdict
 
-from collections import Counter
+import urllib.parse
+import pprint
 
 class ResponseHandler(abc.ABC):
 
@@ -27,3 +29,27 @@ class CounterHandler(ResponseHandler):
     def print_stats(self):
         for k,v in self.counter.items():
             print(k,': ',v)
+
+class ReqTypeCounterHandler(ResponseHandler):
+    '''
+    For the lack of a better name!
+    '''
+    def __init__(self, req_list):
+        #TODO: req dict -> type
+
+        c = defaultdict(dict)
+        for req in req_list:
+            path = urllib.parse.urlparse(req["req_url"]).path
+            c[req["req_type"]][path] = Counter()
+
+        self.counter = c
+
+    def handle_response(self, response, *_):
+        self.counter[response.method][response.url.path][response.status] += 1
+
+    def print_stats(self):
+        # TODO implement me!
+        pprint.pprint(self.counter)
+
+
+def make_counter_handler(ctx):
