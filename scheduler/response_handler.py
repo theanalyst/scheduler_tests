@@ -14,7 +14,8 @@ class ResponseHandler(abc.ABC):
 class CounterHandler(ResponseHandler):
     '''
     A very basic request status counter, aggregating the total requests per
-    status code
+    status code:
+    Final output is just a simple printout of status: aggr count
     '''
 
     def __init__(self):
