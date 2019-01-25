@@ -12,6 +12,8 @@ if __name__ == "__main__":
     client = AsyncClient(sys.argv[1],
                          sys.argv[2],
                          handler = count_handler,
+    client = AsyncClient(
+                         response_handler = count_handler,
                          auth_type = 's3',
                          auth_creds = {'access_key': 'access1', 'secret_key': 'secret1'}
     )

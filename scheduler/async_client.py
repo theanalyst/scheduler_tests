@@ -15,12 +15,9 @@ def get_s3_auth_headers(creds, url, method, body=""):
     return dict(req.headers.items())
 
 class AsyncClient():
-    def __init__(self, url, req_count, handler,
+    def __init__(self, response_handler,
                  auth_type=None, auth_creds=None, limit=None):
-        self.url = url
-        self.req_count = req_count
-        self.session = ClientSession(connector=TCPConnector(limit=limit))
-        self.handler = handler
+        self.handler = response_handler
         self.auth_type = auth_type
         self.auth_creds = auth_creds
 
@@ -32,26 +29,29 @@ class AsyncClient():
         else:
             raise NotImplementedError("the selected auth_type isn't implemented")
 
-    async def get_request(self, headers={}, *params):
+    async def get_request(self, url, session, headers={}, *params):
         auth_headers = self.get_auth_headers(self.auth_type,
-                                             self.auth_creds, self.url, "GET")
+                                             self.auth_creds, url, "GET")
         headers.update(auth_headers)
-        async with self.session.get(self.url, headers=headers, *params) as resp:
-            pass # We don't want to read the output payload yet, we just process the status for now
-        self.handler.handle_response(resp)
+        resp_data = None
+        async with session.get(url, headers=headers, *params) as resp:
+            if self.handler.needs_data():
+                resp_data = await resp.read()
 
-    def make_request(self, req_type, *params):
+        return self.handler.handle_response(resp, resp_data)
+
+    def make_request(self, req_type, req_url, *params):
         if req_type == "GET":
-            return self.get_request(*params)
+            return self.get_request(req_url, *params)
 
 
-    async def run(self, req_type, *args):
+    async def run(self, req_type, req_url, req_count=100, *req_params):
         reqs = []
-        async with self.session as s:
-            for i in range(int(self.req_count)):
-                print('making request!')
+        async with ClientSession(connector=TCPConnector(limit=None, keepalive_timeout=300)) as s:
+            for i in range(int(req_count)):
+                #print('making request!')
                 reqs.append(asyncio.ensure_future(
-                    self.get_request(*args)
+                    self.make_request(req_type, req_url, s, *req_params)
                 ))
 
             responses = await asyncio.gather(*reqs)
