@@ -6,9 +6,8 @@ from botocore.auth import S3SigV4Auth
 from botocore.credentials import Credentials
 from botocore.awsrequest import AWSRequest
 
-def get_s3_auth_headers(creds, url, method, body=""):
-    req = AWSRequest(method = method,
-                     url = url)
+def get_s3_auth_headers(creds, url, method, data=None):
+    req = AWSRequest(method = method, url = url, data=data)
     sig = S3SigV4Auth(Credentials(**creds),
                       's3','us-east-1')
     sig.headers_to_sign(req)
@@ -32,10 +31,15 @@ class AsyncClient():
         else:
             raise NotImplementedError("the selected auth_type isn't implemented")
 
-    async def get_request(self, url, session, headers={}, req_count=1, *params):
-        auth_headers = self.get_auth_headers(self.auth_type,
-                                             self.auth_creds, url, "GET")
+
+    def get_final_headers(self, req_type, req_url, headers, req_data=None):
+        auth_headers = self.get_auth_headers(self.auth_type, self.auth_creds,
+                                             req_url, "GET")
         headers.update(auth_headers)
+        return headers
+
+    async def get_request(self, url, session, headers={}, req_count=1, *params):
+        headers = self.get_final_headers("GET", url, headers)
         resp_data = None
         async with session.get(url, headers=headers, *params) as resp:
             if self.handler.needs_data():
