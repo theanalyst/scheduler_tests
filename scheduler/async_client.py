@@ -46,20 +46,24 @@ class AsyncClient():
         async with session.request(req_type, req_url, headers=headers, **req_params) as resp:
             # this is pure evil for GET requests
             if self.handler.needs_data():
+                self.logger.debug('READING DATA!!!')
                 resp_data = await resp.read()
 
         self.logger.debug('Finished req %s %s: %d' % (req_type, req_url, req_count))
         self.handler.handle_response(resp, resp_data)
 
-    async def run(self, req_type, req_url, req_count=100, **req_params):
+    async def run(self, req_type, req_url, req_count=100, per_req_path=False, **req_params):
         reqs = []
-        timeout = ClientTimeout(total=600)
+        timeout = ClientTimeout(total=3000)
         # TODO: figure out why we get 104s at connection counts > 4000
-        async with ClientSession(connector=TCPConnector(limit=None, keepalive_timeout=300),timeout=timeout) as s:
+        async with ClientSession(connector=TCPConnector(keepalive_timeout=3000),timeout=timeout) as s:
             for i in range(int(req_count)):
+                url = req_url
+                if per_req_path:
+                    url += str(i)
                 self.logger.debug('making request: %d' % i)
                 reqs.append(asyncio.ensure_future(
-                    self.make_request(req_type, req_url, s, req_count=i, **req_params)
+                    self.make_request(req_type, url, s, req_count=i, **req_params)
                 ))
 
             responses = await asyncio.gather(*reqs)

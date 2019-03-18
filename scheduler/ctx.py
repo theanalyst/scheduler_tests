@@ -3,7 +3,8 @@ import logging
 import utils
 
 class Ctx():
-    def __init__(self, auth_type, log_level, arg_list, auth_creds, response_handler=None):
+    def __init__(self, auth_type, log_level, arg_list, auth_creds,
+                 response_handler=None):
         self.auth_type = auth_type
         self.log_level = utils.str_to_log_level(log_level)
         self.arg_list = arg_list
@@ -36,6 +37,7 @@ def make_ctx(conffile):
         d = {}
         d['req_type'] = cfg[section].get('req_type')
         d['req_url'] = utils.normalise_url_path(baseurl, cfg[section].get('req_path'))
+        d['per_req_path'] = cfg[section].getboolean('per_req_path', False)
         d['req_count'] = cfg[section].get('req_count',base_req_count)
         sz = cfg[section].getint('obj_size',0)
         if sz > 0:

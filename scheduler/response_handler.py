@@ -51,9 +51,24 @@ class ReqTypeCounterHandler(ResponseHandler):
         # TODO implement me!
         pprint.pprint(self.counter)
 
+class PathCountHandler(ResponseHandler):
+
+    def __init__(self):
+        #TODO: req dict -> type
+
+        self.counter = defaultdict(int)
+
+
+    def handle_response(self, response, *_):
+        self.counter[response.url.path] += 1
+
+    def needs_data(self):
+        return True
 
 def make_response_handler(ctx):
     if ctx.response_handler == 'simple':
         return CounterHandler()
+    elif ctx.response_handler == 'path':
+        return PathCountHandler()
     # default to reqtype counter
     return ReqTypeCounterHandler(ctx.arg_list)
