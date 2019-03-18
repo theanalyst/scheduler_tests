@@ -13,7 +13,7 @@ def normalise_url_path(baseurl, path):
     return urljoin(baseurl, path)
 
 def create_buffer(sz):
-    data = b"a"*(10**6)
+    data = b"a"*sz
     mv = memoryview(data)
     return mv
 
