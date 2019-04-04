@@ -4,19 +4,20 @@ import utils
 
 class Ctx():
     def __init__(self, auth_type, log_level, arg_list, auth_creds,
-                 response_handler=None):
+                 base_url, response_handler=None, buckets=[]):
         self.auth_type = auth_type
         self.log_level = utils.str_to_log_level(log_level)
         self.arg_list = arg_list
         self.auth_creds = auth_creds
+        self.base_url = base_url
         self.response_handler = response_handler
+        self.buckets = buckets
 
     def set_up_logging(self):
         logging.basicConfig(level=self.log_level)
         logging.getLogger('asyncio').setLevel(self.log_level)
         logging.getLogger('botocore').setLevel(self.log_level)
         logging.getLogger('async-client').setLevel(self.log_level)
-
 
 def make_ctx(conffile):
     cfg = configparser.ConfigParser()
@@ -32,6 +33,9 @@ def make_ctx(conffile):
         auth_creds['access_key'] = cfg['DEFAULT']['access_key']
         auth_creds['secret_key'] = cfg['DEFAULT']['secret_key']
 
+    create_bucket_args = []
+    buckets_str = cfg['DEFAULT'].get('create_buckets', "")
+    buckets = [bucket.strip() for bucket in buckets_str.split(",")]
     args_lst = []
     for section in cfg.sections():
         d = {}
@@ -44,4 +48,5 @@ def make_ctx(conffile):
             bufferv = utils.create_buffer(sz)
             d['data'] = bufferv
         args_lst.append(d)
-    return Ctx(auth_type, loglevel, args_lst, auth_creds, resp_handler)
+    return Ctx(auth_type, loglevel, args_lst, auth_creds,
+               baseurl, resp_handler, buckets)

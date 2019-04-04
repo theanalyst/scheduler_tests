@@ -15,8 +15,12 @@ if __name__ == "__main__":
                          auth_type = client_ctx.auth_type,
                          auth_creds = client_ctx.auth_creds
     )
+    # Ensure that buckets are created before running other args
+    utils.create_buckets(client_ctx.buckets, client_ctx.base_url,
+                         client_ctx.auth_creds)
 
     ev_loop = asyncio.get_event_loop()
+
     futures = [ asyncio.ensure_future(client.run(**kwargs)) for kwargs in client_ctx.arg_list ]
     ev_loop.run_until_complete(asyncio.gather(*futures))
     resp_handler.print_stats()
