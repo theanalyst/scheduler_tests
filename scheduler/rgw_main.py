@@ -33,4 +33,4 @@ if __name__ == "__main__":
 
     #perf_final = admin_socket.perf_dump(client_ctx.admin_sock_path)
     #print(perf_final)
-    resp_handler.print_stats()
+    resp_handler.aggr_stats()

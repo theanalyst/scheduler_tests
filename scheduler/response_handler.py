@@ -30,6 +30,24 @@ class CounterHandler(ResponseHandler):
         for k,v in self.counter.items():
             print(k,': ',v)
 
+    def aggr_stats(self):
+        total_req = 0
+        succ_req = 0
+        error_req = 0
+        denied_req = 0
+        unknown_req = 0
+
+        for req_status, req_count in self.counter.items():
+            total_req += req_count
+            if req_status >= 200 and req_status <= 300:
+                succ_req += req_count
+            elif req_status >= 400 and req_status <= 400 :
+                error_req += req_count
+            elif req_status >= 500 and req_status <= 510 :
+                denied_req += req_count
+
+
+
 class ReqTypeCounterHandler(ResponseHandler):
     '''
     For the lack of a better name!
