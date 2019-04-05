@@ -1,6 +1,8 @@
 import configparser
 import logging
-import utils
+from typing import NamedTuple
+
+from . import utils
 
 class Ctx():
     # TODO: typing.NamedTuple would make sense here
