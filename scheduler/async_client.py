@@ -46,7 +46,7 @@ class AsyncClient():
         async with session.request(req_type, req_url, headers=headers, **req_params) as resp:
             # this is pure evil for GET requests
             if self.handler.needs_data():
-                self.logger.debug('READING DATA!!!')
+                self.logger.debug('reading data')
                 resp_data = await resp.read()
 
         self.logger.debug('Finished req %s %s: %d' % (req_type, req_url, req_count))
