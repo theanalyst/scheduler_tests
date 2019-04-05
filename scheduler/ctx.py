@@ -3,6 +3,7 @@ import logging
 import utils
 
 class Ctx():
+    # TODO: typing.NamedTuple would make sense here
     def __init__(self, auth_type, log_level, arg_list, auth_creds,
                  base_url, response_handler=None, buckets=[], admin_sock_path=None):
         self.auth_type = auth_type
