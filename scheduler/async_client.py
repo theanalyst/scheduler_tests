@@ -54,7 +54,7 @@ class AsyncClient():
 
     async def run(self, req_type, req_url, req_count=100, per_req_path=False, **req_params):
         reqs = []
-        timeout = ClientTimeout(total=3000)
+        timeout = ClientTimeout(total=600)
         # TODO: figure out why we get 104s at connection counts > 4000
         async with ClientSession(connector=TCPConnector(keepalive_timeout=3000),timeout=timeout) as s:
             for i in range(int(req_count)):
