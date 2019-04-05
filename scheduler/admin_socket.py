@@ -6,7 +6,7 @@ import logging
 
 async def async_perf_dump(sock_path):
     perf_dump = await admin_sock_cmd(sock_path, {"prefix": "perf dump"})
-    print(perf_dump['simple-throttler'])
+    return perf_dump['simple-throttler']
 
 async def admin_sock_cmd(sock_path, cmd_dict):
     # TODO: can we ctx mgr here?

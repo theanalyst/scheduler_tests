@@ -31,22 +31,22 @@ class CounterHandler(ResponseHandler):
             print(k,': ',v)
 
     def aggr_stats(self):
-        total_req = 0
-        succ_req = 0
-        error_req = 0
-        denied_req = 0
-        unknown_req = 0
+        d = {'total': 0,
+             'success': 0,
+             'error':0,
+             'denied':0,
+             'unknown':0}
 
         for req_status, req_count in self.counter.items():
-            total_req += req_count
+            d['total'] += req_count
             if req_status >= 200 and req_status <= 300:
-                succ_req += req_count
+                d['success'] += req_count
             elif req_status >= 400 and req_status <= 400 :
-                error_req += req_count
+                d['error'] += req_count
             elif req_status >= 500 and req_status <= 510 :
-                denied_req += req_count
+                d['denied'] += req_count
 
-
+        return d
 
 class ReqTypeCounterHandler(ResponseHandler):
     '''
@@ -83,10 +83,13 @@ class PathCountHandler(ResponseHandler):
     def needs_data(self):
         return True
 
-def make_response_handler(ctx):
-    if ctx.response_handler == 'simple':
+def make_response_hanlder_from_str(handler_str):
+    if handler_str == 'simple':
         return CounterHandler()
-    elif ctx.response_handler == 'path':
+    elif handler_str == 'path':
         return PathCountHandler()
     # default to reqtype counter
     return ReqTypeCounterHandler(ctx.arg_list)
+
+def make_response_handler(ctx):
+    return make_response_hanlder_from_str(ctx.response_handler)
