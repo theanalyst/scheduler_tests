@@ -4,7 +4,7 @@ import utils
 
 class Ctx():
     def __init__(self, auth_type, log_level, arg_list, auth_creds,
-                 base_url, response_handler=None, buckets=[]):
+                 base_url, response_handler=None, buckets=[], admin_sock_path=None):
         self.auth_type = auth_type
         self.log_level = utils.str_to_log_level(log_level)
         self.arg_list = arg_list
@@ -12,12 +12,14 @@ class Ctx():
         self.base_url = base_url
         self.response_handler = response_handler
         self.buckets = buckets
+        self.admin_sock_path = admin_sock_path
 
     def set_up_logging(self):
         logging.basicConfig(level=self.log_level)
         logging.getLogger('asyncio').setLevel(self.log_level)
         logging.getLogger('botocore').setLevel(self.log_level)
         logging.getLogger('async-client').setLevel(self.log_level)
+        logging.getLogger('admin-sock').setLevel(self.log_level)
 
 def make_ctx(conffile):
     cfg = configparser.ConfigParser()
@@ -27,7 +29,8 @@ def make_ctx(conffile):
     base_req_count = cfg['DEFAULT'].getint('req_count',100)
     loglevel = cfg['DEFAULT'].get('log_level','INFO')
     auth_type = cfg['DEFAULT'].get('auth_type','s3')
-    resp_handler = cfg['DEFAULT'].get('response_handler',None)
+    resp_handler = cfg['DEFAULT'].get('response_handler', None)
+    admin_sock_path = cfg['DEFAULT'].get('admin_sock_path', None)
     auth_creds = dict()
     if auth_type.lower() == 's3':
         auth_creds['access_key'] = cfg['DEFAULT']['access_key']
@@ -49,4 +52,4 @@ def make_ctx(conffile):
             d['data'] = bufferv
         args_lst.append(d)
     return Ctx(auth_type, loglevel, args_lst, auth_creds,
-               baseurl, resp_handler, buckets)
+               baseurl, resp_handler, buckets, admin_sock_path)
