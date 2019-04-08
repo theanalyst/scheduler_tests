@@ -1,2 +1,4 @@
 aiohttp
 botocore
+boto3
+pytest
