@@ -40,7 +40,7 @@ def make_ctx(conffile):
         auth_creds['secret_key'] = cfg['DEFAULT']['secret_key']
 
     create_bucket_args = []
-    buckets_str = cfg['DEFAULT'].get('create_buckets', "")
+    buckets_str = cfg['DEFAULT'].get('create_buckets', "").strip('\"\ ')
     buckets = [bucket.strip() for bucket in buckets_str.split(",")]
     args_lst = []
     for section in cfg.sections():
