@@ -7,7 +7,7 @@ from . import utils
 from . import ctx
 from . import admin_socket
 from .async_client import AsyncClient
-from .response_handler import make_response_handler
+from .response_handler import make_response_handler_from_str
 
 import pytest
 
