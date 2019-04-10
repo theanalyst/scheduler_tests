@@ -1,11 +1,11 @@
 import sys
 import asyncio
 
-from client_ctx import ctx, utils
-from async_client.async_client import AsyncClient
-from async_client.response_handler import make_response_handler
+from rbench.client_ctx import ctx, utils
+from rbench.async_client.async_client import AsyncClient
+from rbench.async_client.response_handler import make_response_handler
 
-if __name__ == "__main__":
+def main():
     utils.assert_py_version()
     client_ctx = ctx.make_ctx(sys.argv[1])
     resp_handler = make_response_handler(client_ctx)

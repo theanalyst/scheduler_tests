@@ -5,9 +5,9 @@ import json
 
 import pytest
 
-from client_ctx import ctx, utils
-from async_client import AsyncClient
-from async_client.response_handler import make_response_handler_from_str
+from rbench.async_client.async_client import AsyncClient
+from rbench.async_client.response_handler import make_response_handler_from_str
+from rbench.client_ctx import ctx, utils
 from rgw import admin_socket
 
 def test_python_version():
