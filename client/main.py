@@ -2,7 +2,7 @@ import sys
 import asyncio
 
 from client_ctx import ctx, utils
-from async_client import AsyncClient
+from async_client.async_client import AsyncClient
 from async_client.response_handler import make_response_handler
 
 if __name__ == "__main__":
