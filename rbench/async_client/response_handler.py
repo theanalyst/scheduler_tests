@@ -65,7 +65,6 @@ class PathCountHandler(ResponseHandler):
 
     def __init__(self):
         #TODO: req dict -> type
-
         self.counter = defaultdict(int)
 
 
@@ -75,7 +74,10 @@ class PathCountHandler(ResponseHandler):
     def needs_data(self):
         return True
 
-def make_response_handler_from_str(handler_str):
+    def print_stats(self):
+        pprint.pprint(self.counter)
+
+def make_response_handler_from_str(handler_str, ctx=None):
     if handler_str == 'simple':
         return CounterHandler()
     elif handler_str == 'path':
@@ -84,4 +86,4 @@ def make_response_handler_from_str(handler_str):
     return ReqTypeCounterHandler(ctx.arg_list)
 
 def make_response_handler(ctx):
-    return make_response_handler_from_str(ctx.response_handler)
+    return make_response_handler_from_str(ctx.response_handler, ctx=ctx)
